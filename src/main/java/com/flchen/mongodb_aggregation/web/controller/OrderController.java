@@ -4,18 +4,19 @@ import com.flchen.mongodb_aggregation.common.controller.BaseController;
 import com.flchen.mongodb_aggregation.common.mo.ResponseMO;
 import com.flchen.mongodb_aggregation.entity.GoodsDO;
 import com.flchen.mongodb_aggregation.entity.OrderDO;
+import com.flchen.mongodb_aggregation.entity.TO.OrderTO;
 import com.flchen.mongodb_aggregation.entity.UserDO;
 import com.flchen.mongodb_aggregation.repository.GoodsAutoRepo;
 import com.flchen.mongodb_aggregation.repository.OrderAutoRepo;
+import com.flchen.mongodb_aggregation.repository.OrderRepo;
 import com.flchen.mongodb_aggregation.repository.UserAutoRepo;
 import com.flchen.mongodb_aggregation.web.mo.OrderAddMO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,6 +36,9 @@ public class OrderController extends BaseController {
 
     @Autowired
     private GoodsAutoRepo goodsAutoRepo;
+
+    @Autowired
+    private OrderRepo orderRepo;
 
 
     @PostMapping
@@ -60,5 +64,12 @@ public class OrderController extends BaseController {
         orderAutoRepo.save(orderDO);
 
         return success(orderDO);
+    }
+
+    @GetMapping("/{userId}")
+    public ResponseMO searchOrdersByUserId(@PathVariable("userId") @NotBlank String userId) {
+
+        List<OrderTO> orderTOS = orderRepo.findByUserIdOrderByGoods_priceOrderByGoods_shelfState(userId);
+        return success(orderTOS);
     }
 }
